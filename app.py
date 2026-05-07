@@ -446,6 +446,8 @@ for key, default in [
 
 inject_theme()
 
+DEMO_MODE = os.path.exists("data_ai/.demo_mode")
+
 # ── Load data ─────────────────────────────────────────────────────────────────
 employees = load_employees()
 shifts    = load_shifts()
@@ -540,6 +542,16 @@ is_manager = mode == "Manager"
 
 st.markdown(logo_html(width="340px"), unsafe_allow_html=True)
 st.caption("Schedule staff · enforce labor law · manage swaps · track certifications · monitor burnout")
+
+if DEMO_MODE:
+    st.markdown(
+        '<div style="background:#0F2D52;color:#F5A623;padding:12px 20px;border-radius:10px;'
+        'margin:8px 0;display:flex;align-items:center;gap:12px">'
+        '<span style="font-size:1.3em">▶</span>'
+        '<span style="font-weight:800;font-size:1.05em;letter-spacing:0.5px">DEMO MODE</span>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
 if is_manager and st.session_state.get("training_mode"):
     st.markdown(
@@ -1079,15 +1091,30 @@ if is_manager:
     # ── Burnout Monitor ────────────────────────────────────────────────────
     with tab_burn:
         st.subheader("Employee Burnout Monitor")
-        st.markdown(
-            "Tracks consecutive working days across weeks. California labor law generally limits employees "
-            "to **6 consecutive days** before requiring a day off."
-        )
-        st.markdown(
-            "**Legend:** 🟢 1–4 days &nbsp;|&nbsp; 🟡 5 days — caution &nbsp;|&nbsp; "
-            "🟠 6 days — at limit &nbsp;|&nbsp; 🔴 7+ days — potential violation"
-        )
-        st.divider()
+
+        # Header info + legend bar
+        st.markdown("""
+        <div style="background:#f7f9fc;border-radius:10px;padding:14px 18px;margin-bottom:16px;border:1px solid #e2e8f0">
+            <span style="color:#0F2D52;font-size:0.92em">
+            Tracks consecutive working days across weeks. California labor law limits employees to
+            <strong>6 consecutive days</strong> before a required day off.
+            </span>
+            <div style="display:flex;gap:18px;margin-top:10px;flex-wrap:wrap">
+                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">
+                    <span style="width:12px;height:12px;border-radius:3px;background:#22C55E;display:inline-block"></span> 1–4 days &nbsp;Healthy
+                </span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">
+                    <span style="width:12px;height:12px;border-radius:3px;background:#EAB308;display:inline-block"></span> 5 days &nbsp;Caution
+                </span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">
+                    <span style="width:12px;height:12px;border-radius:3px;background:#F97316;display:inline-block"></span> 6 days &nbsp;At Limit
+                </span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">
+                    <span style="width:12px;height:12px;border-radius:3px;background:#EF4444;display:inline-block"></span> 7+ days &nbsp;Violation Risk
+                </span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
         if len(employees) == 0:
             st.info("No employees yet.")
@@ -1097,63 +1124,112 @@ if is_manager:
             today = date.today()
             any_risk = False
 
+            LEVEL_META = {
+                "ok":      {"bar": "#22C55E", "bg": "#ffffff",   "border": "#e2e8f0", "chip_bg": "#dcfce7", "chip_fg": "#166534", "label": "Healthy"},
+                "caution": {"bar": "#EAB308", "bg": "#fefce8",   "border": "#FDE047", "chip_bg": "#fef9c3", "chip_fg": "#713f12", "label": "Caution"},
+                "warning": {"bar": "#F97316", "bg": "#fff7ed",   "border": "#FDBA74", "chip_bg": "#ffedd5", "chip_fg": "#7c2d12", "label": "At Limit"},
+                "danger":  {"bar": "#EF4444", "bg": "#fff5f5",   "border": "#FCA5A5", "chip_bg": "#fee2e2", "chip_fg": "#7f1d1d", "label": "Violation Risk"},
+            }
+
             for role_name in ROLES:
                 grp = employees[employees["role"] == role_name].sort_values("name")
                 if len(grp) == 0:
                     continue
 
-                color = ROLE_COLORS.get(role_name, "#888")
+                role_color = ROLE_COLORS.get(role_name, "#888")
                 st.markdown(
-                    f'<h4 style="margin-top:1em"><span style="background:{color};color:#fff;'
-                    f'padding:3px 14px;border-radius:14px">{role_name}s</span></h4>',
+                    f'<div style="display:flex;align-items:center;gap:10px;margin:20px 0 8px 0">'
+                    f'<span style="background:{role_color};color:#fff;padding:3px 14px;border-radius:20px;'
+                    f'font-size:0.82em;font-weight:700;letter-spacing:0.3px">{role_name}s</span>'
+                    f'</div>',
                     unsafe_allow_html=True,
                 )
 
+                cards_html = ""
                 for _, emp in grp.iterrows():
                     streak, streak_dates = get_consecutive_streak(int(emp["id"]), shifts)
-                    level, icon = burnout_level(streak)
+                    level, _ = burnout_level(streak)
                     if level != "ok":
                         any_risk = True
 
-                    with st.container(border=(level != "ok")):
-                        c1, c2, c3 = st.columns([2, 1, 4])
-                        c1.markdown(f"**{emp['name']}**")
-                        if streak == 0:
-                            c2.write("—")
-                            c3.write("No recent consecutive days")
-                        else:
-                            streak_label = f"{icon} **{streak} consecutive day{'s' if streak > 1 else ''}**"
-                            c2.markdown(streak_label)
+                    m = LEVEL_META[level]
+                    max_days = 7
 
-                            # Show the actual date range
-                            if streak_dates:
-                                first = streak_dates[0]
-                                last  = streak_dates[-1]
-                                # Highlight if spans previous week
-                                crosses_week = any(d < today - timedelta(days=today.weekday()) for d in streak_dates) and \
-                                               any(d >= today - timedelta(days=today.weekday()) for d in streak_dates)
+                    # Date range string
+                    if streak_dates:
+                        first, last = streak_dates[0], streak_dates[-1]
+                        crosses_week = (
+                            any(d < today - timedelta(days=today.weekday()) for d in streak_dates) and
+                            any(d >= today - timedelta(days=today.weekday()) for d in streak_dates)
+                        )
+                        date_range = f"{first.strftime('%b %d')} – {last.strftime('%b %d')}"
+                        if crosses_week:
+                            date_range += " · spans prior week"
+                    else:
+                        date_range = "No recent shifts"
 
-                                date_str = f"{first.strftime('%b %d')} – {last.strftime('%b %d')}"
-                                if crosses_week:
-                                    date_str += " *(spans prior week)*"
+                    # Day-dot bar (7 dots max)
+                    dots = ""
+                    for i in range(1, max_days + 1):
+                        filled = i <= streak
+                        dot_color = m["bar"] if filled else "#e2e8f0"
+                        dots += (
+                            f'<span style="width:14px;height:14px;border-radius:50%;'
+                            f'background:{dot_color};display:inline-block;margin-right:4px"></span>'
+                        )
 
-                                c3.markdown(date_str)
+                    # Alert line
+                    alert_html = ""
+                    if level == "danger":
+                        alert_html = (
+                            f'<div style="margin-top:8px;font-size:0.78em;color:#7f1d1d;'
+                            f'background:#fee2e2;border-radius:6px;padding:5px 10px">'
+                            f'Day off required — potential CA labor law violation.</div>'
+                        )
+                    elif level == "warning":
+                        alert_html = (
+                            f'<div style="margin-top:8px;font-size:0.78em;color:#7c2d12;'
+                            f'background:#ffedd5;border-radius:6px;padding:5px 10px">'
+                            f'At the 6-day maximum. Schedule a rest day before adding more shifts.</div>'
+                        )
+                    elif level == "caution":
+                        alert_html = (
+                            f'<div style="margin-top:8px;font-size:0.78em;color:#713f12;'
+                            f'background:#fef9c3;border-radius:6px;padding:5px 10px">'
+                            f'Approaching the limit. Consider scheduling a rest day soon.</div>'
+                        )
 
-                                if level == "danger":
-                                    c3.error(
-                                        f"🚨 **{emp['name']}** has worked {streak} consecutive days. "
-                                        "This may violate CA labor law. A day off is required."
-                                    )
-                                elif level == "warning":
-                                    c3.warning(
-                                        f"**{emp['name']}** is at the 6-day maximum. "
-                                        "Schedule a day off before adding more shifts."
-                                    )
-                                elif level == "caution":
-                                    c3.info(f"Approaching limit. Consider scheduling a rest day soon.")
+                    streak_text = f"{streak} day{'s' if streak != 1 else ''}" if streak > 0 else "—"
+
+                    cards_html += f"""
+                    <div style="background:{m['bg']};border:1px solid {m['border']};border-left:5px solid {m['bar']};
+                        border-radius:10px;padding:12px 16px;margin-bottom:10px;display:flex;
+                        flex-direction:column;gap:4px">
+                        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+                            <span style="font-weight:700;font-size:0.97em;color:#0F2D52">{emp['name']}</span>
+                            <span style="display:flex;align-items:center;gap:8px">
+                                <span style="background:{m['chip_bg']};color:{m['chip_fg']};font-size:0.75em;
+                                    font-weight:700;padding:2px 10px;border-radius:20px">{m['label']}</span>
+                                <span style="font-size:0.85em;color:#4A5568;font-weight:600">{streak_text} consecutive</span>
+                            </span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:4px;flex-wrap:wrap">
+                            <div>{dots}</div>
+                            <span style="font-size:0.8em;color:#718096">{date_range}</span>
+                        </div>
+                        {alert_html}
+                    </div>
+                    """
+
+                st.markdown(cards_html, unsafe_allow_html=True)
 
             if not any_risk:
-                st.success("✅ All employees are within healthy working day limits.")
+                st.markdown(
+                    '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;'
+                    'padding:16px 20px;color:#166534;font-weight:600;font-size:0.95em;margin-top:12px">'
+                    '✓ All employees are within healthy working day limits.</div>',
+                    unsafe_allow_html=True,
+                )
 
 
 # ════════════════════════════════════════════════════════════════════════════
