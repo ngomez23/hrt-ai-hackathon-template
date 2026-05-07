@@ -59,6 +59,31 @@ def inject_theme():
         color: #ffffff !important;
     }
 
+    /* ── Venues tab (2): green location pin ── */
+    .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-child(2)::before {
+        content: " ";
+        display: inline-block; width: 14px; height: 14px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5S10.6 6.5 12 6.5s2.5 1.1 2.5 2.5S13.4 11.5 12 11.5z' fill='%2322C55E'/%3E%3C/svg%3E");
+        background-size: contain; background-repeat: no-repeat; background-position: center;
+        margin-right: 5px; vertical-align: middle;
+    }
+    /* ── Swap Requests tab (5): gold right + blue left arrows ── */
+    .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-child(5)::before {
+        content: " ";
+        display: inline-block; width: 20px; height: 13px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16'%3E%3Cline x1='1' y1='4' x2='13' y2='4' stroke='%23F5A623' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpolyline points='10%2C1 13%2C4 10%2C7' fill='none' stroke='%23F5A623' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='19' y1='12' x2='7' y2='12' stroke='%231E88E5' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpolyline points='10%2C9 7%2C12 10%2C15' fill='none' stroke='%231E88E5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-size: contain; background-repeat: no-repeat; background-position: center;
+        margin-right: 5px; vertical-align: middle;
+    }
+    /* ── Certifications tab (6): gold 8-point starburst + navy checkmark ── */
+    .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-child(6)::before {
+        content: " ";
+        display: inline-block; width: 15px; height: 15px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='12,0.5 14.94,2.97 18.76,2.70 19.69,6.41 22.94,8.45 21.5,12 22.94,15.55 19.69,17.59 18.76,21.30 14.94,21.03 12,23.5 9.06,21.03 5.24,21.30 4.31,17.59 1.06,15.55 2.5,12 1.06,8.45 4.31,6.41 5.24,2.70 9.06,2.97' fill='%23D4A017'/%3E%3Cpolyline points='8.5,12 10.8,14.8 15.5,9' fill='none' stroke='%230F2D52' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-size: contain; background-repeat: no-repeat; background-position: center;
+        margin-right: 5px; vertical-align: middle;
+    }
+
     /* ── Tabs: gold active underline, navy text ── */
     .stTabs [data-baseweb="tab-highlight"] {
         background-color: #F5A623 !important;
@@ -113,6 +138,28 @@ def inject_theme():
     }
     [data-testid="stSidebar"] a.view-link:hover {
         background-color: rgba(255,255,255,0.10) !important;
+    }
+    /* ── Hide JS injection iframe ── */
+    [data-testid="stCustomComponentV1"] {
+        display: none !important;
+        height: 0 !important;
+    }
+    /* ── Sidebar alert buttons (clickable warnings) ── */
+    [data-testid="stSidebar"] .stButton button {
+        background-color: rgba(245,166,35,0.15) !important;
+        border: 1px solid rgba(245,166,35,0.45) !important;
+        border-left: 3px solid #F5A623 !important;
+        color: white !important;
+        text-align: left !important;
+        font-size: 0.83em !important;
+        border-radius: 5px !important;
+        margin: 2px 0 !important;
+        padding: 5px 10px !important;
+        width: 100% !important;
+    }
+    [data-testid="stSidebar"] .stButton button:hover {
+        background-color: rgba(245,166,35,0.28) !important;
+        border-color: #F5A623 !important;
     }
     /* ── Training toggle indented ── */
     [data-testid="stSidebar"] [data-testid="stToggle"] {
@@ -217,6 +264,9 @@ def load_swaps():
         for col in ["id", "requester_id", "target_id", "requester_shift_id", "target_shift_id"]:
             df[col] = df[col].astype(int)
         df["requested_at"] = pd.to_datetime(df["requested_at"])
+        for col in ["resolved_at", "manager_notes", "requester_note", "status"]:
+            if col in df.columns:
+                df[col] = df[col].astype(object)
         return df
     return pd.DataFrame(columns=[
         "id", "requester_id", "requester_shift_id", "target_id", "target_shift_id",
@@ -343,10 +393,10 @@ def get_consecutive_streak(emp_id, shifts_df):
     return 0, []
 
 def burnout_level(streak):
-    if streak >= BURNOUT_DANGER:  return "danger",  "🔴"
-    if streak >= BURNOUT_WARNING: return "warning",  "🟠"
-    if streak >= BURNOUT_CAUTION: return "caution",  "🟡"
-    return "ok", "🟢"
+    if streak >= BURNOUT_DANGER:  return "danger",  "🔥🔥🔥"
+    if streak >= BURNOUT_WARNING: return "warning",  "🔥🔥"
+    if streak >= BURNOUT_CAUTION: return "caution",  "🔥"
+    return "ok", ""
 
 
 # ── Cert helpers ──────────────────────────────────────────────────────────────
@@ -439,6 +489,8 @@ for key, default in [
     ("vis_week_start", None),
     ("vis_schedule_day", None),
     ("training_mode", False),
+    ("jump_to_tab", None),
+    ("mgr_tab", "Employees"),
 ]:
     if key not in st.session_state:
         st.session_state[key] = default
@@ -523,11 +575,15 @@ with st.sidebar:
             for _, r in employees.iterrows()
         )
         if total_issues:
-            st.warning(f"⚠️ {total_issues} certification issue(s)")
+            if st.button(f"⚠️ {total_issues} certification issue(s)", key="sb_certs", use_container_width=True):
+                st.session_state.jump_to_tab = "Certifications"
+                st.rerun()
 
     n_pending = len(swaps[swaps["status"] == "pending"]) if len(swaps) > 0 else 0
     if n_pending:
-        st.warning(f"🔄 {n_pending} swap request(s) pending")
+        if st.button(f"🔄 {n_pending} swap request(s) pending", key="sb_swaps", use_container_width=True):
+            st.session_state.jump_to_tab = "Swap Requests"
+            st.rerun()
 
     if len(employees) > 0 and len(shifts) > 0:
         burnout_risks = [
@@ -536,7 +592,9 @@ with st.sidebar:
         ]
         at_risk = sum(1 for s in burnout_risks if s >= BURNOUT_CAUTION)
         if at_risk:
-            st.warning(f"🔥 {at_risk} employee(s) at burnout risk")
+            if st.button(f"🔥 {at_risk} employee(s) at burnout risk", key="sb_burn", use_container_width=True):
+                st.session_state.jump_to_tab = "Burnout Monitor"
+                st.rerun()
 
 is_manager = mode == "Manager"
 
@@ -571,18 +629,49 @@ st.divider()
 # MANAGER VIEW
 # ════════════════════════════════════════════════════════════════════════════
 if is_manager:
-    swap_badge  = "  🔴" if n_pending else ""
+    if n_pending > 0:
+        st.markdown(f"""<style>
+        .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-child(5)::after {{
+            content: "{n_pending}";
+            background-color: #EF4444;
+            color: white;
+            font-size: 0.62em;
+            font-weight: 800;
+            border-radius: 10px;
+            padding: 1px 5px;
+            margin-left: 5px;
+            vertical-align: middle;
+            display: inline-block;
+            line-height: 1.4;
+        }}
+        </style>""", unsafe_allow_html=True)
+
     tabs = st.tabs([
         "👥 Employees",
-        "🏢 Venues",
+        "Venues",
         "📅 Visual Scheduler",
-        "📆 Weekly View",
-        f"🔄 Swap Requests{swap_badge}",
-        "🎓 Certifications",
+        "🗒️ Weekly View",
+        "Swap Requests",
+        "Certifications",
         "🔥 Burnout Monitor",
     ])
     tab_emp, tab_venues, tab_vis, tab_week, tab_swaps, tab_certs, tab_burn = tabs
 
+    # Jump to tab if triggered from sidebar alert
+    if st.session_state.get("jump_to_tab"):
+        target = st.session_state.jump_to_tab
+        st.session_state.jump_to_tab = None
+        import streamlit.components.v1 as components
+        components.html(f"""<script>
+        setTimeout(function() {{
+            var tabs = window.parent.document.querySelectorAll('[data-baseweb="tab"]');
+            for (var i = 0; i < tabs.length; i++) {{
+                if (tabs[i].textContent.indexOf('{target}') >= 0) {{
+                    tabs[i].click(); break;
+                }}
+            }}
+        }}, 300);
+        </script>""", height=0, scrolling=False)
 
     # ── Employees ──────────────────────────────────────────────────────────
     with tab_emp:
@@ -1032,12 +1121,16 @@ if is_manager:
                                     shifts.loc[shifts["id"] == int(swap["requester_shift_id"]), "employee_id"] = int(swap["target_id"])
                                     shifts.loc[shifts["id"] == int(swap["target_shift_id"]),    "employee_id"] = int(swap["requester_id"])
                                     save_shifts(shifts)
-                                swaps.loc[swaps["id"] == swap["id"], ["status", "resolved_at", "manager_notes"]] = ["approved", datetime.now().isoformat(), mgr_note]
+                                swaps.loc[swaps["id"] == swap["id"], "status"]       = "approved"
+                                swaps.loc[swaps["id"] == swap["id"], "resolved_at"]  = datetime.now().isoformat()
+                                swaps.loc[swaps["id"] == swap["id"], "manager_notes"] = mgr_note
                                 save_swaps(swaps)
                                 st.success("Swap approved and schedule updated.")
                                 st.rerun()
                             if bc2.button("❌ Deny", key=f"deny_{swap['id']}"):
-                                swaps.loc[swaps["id"] == swap["id"], ["status", "resolved_at", "manager_notes"]] = ["denied", datetime.now().isoformat(), mgr_note]
+                                swaps.loc[swaps["id"] == swap["id"], "status"]       = "denied"
+                                swaps.loc[swaps["id"] == swap["id"], "resolved_at"]  = datetime.now().isoformat()
+                                swaps.loc[swaps["id"] == swap["id"], "manager_notes"] = mgr_note
                                 save_swaps(swaps)
                                 st.rerun()
                         else:
@@ -1048,44 +1141,76 @@ if is_manager:
 
     # ── Certifications ─────────────────────────────────────────────────────
     with tab_certs:
-        st.subheader("Certification Tracker")
+        st.markdown("""<div style="display:flex;align-items:center;gap:16px;margin-bottom:8px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="56" height="56"><defs><radialGradient id="goldSeal" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#FFE566"/><stop offset="50%" stop-color="#D4A017"/><stop offset="100%" stop-color="#B8860B"/></radialGradient></defs><polygon fill="url(#goldSeal)" points="12,0.5 14.94,2.97 18.76,2.70 19.69,6.41 22.94,8.45 21.5,12 22.94,15.55 19.69,17.59 18.76,21.30 14.94,21.03 12,23.5 9.06,21.03 5.24,21.30 4.31,17.59 1.06,15.55 2.5,12 1.06,8.45 4.31,6.41 5.24,2.70 9.06,2.97"/><polyline points="8.5,12 10.8,14.8 15.5,9" fill="none" stroke="#0F2D52" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:1.45em;font-weight:800;color:#0F2D52;letter-spacing:-0.3px">Certification Tracker</span></div>""", unsafe_allow_html=True)
         if len(employees) == 0:
             st.info("Add employees to track certifications.")
         else:
+            def cert_status_badge(emp_id, cert_type):
+                today = date.today()
+                ec = certs[(certs["employee_id"] == emp_id) & (certs["cert_type"] == cert_type)]
+                if len(ec) == 0:
+                    return ("Not on file", "#f1f5f9", "#374151", True)
+                latest = ec.sort_values("expiry_date", ascending=False).iloc[0]
+                exp = latest["expiry_date"]
+                if exp < today:
+                    return (f"Expired · {exp.strftime('%b %d, %Y')}", "#fee2e2", "#7f1d1d", True)
+                days_left = (exp - today).days
+                if days_left <= ALERT_DAYS:
+                    return (f"Expires {exp.strftime('%b %d, %Y')}", "#fef9c3", "#713f12", True)
+                return (f"Valid · {exp.strftime('%b %d, %Y')}", "#dcfce7", "#166534", False)
+
             any_issues = False
             for role_name in ROLES:
-                grp = employees[employees["role"] == role_name]
+                grp = employees[employees["role"] == role_name].sort_values("name")
                 if len(grp) == 0:
                     continue
-                color    = ROLE_COLORS.get(role_name, "#888")
-                req_cts  = ROLE_CERTS.get(role_name, [])
+                color   = ROLE_COLORS.get(role_name, "#888")
+                req_cts = ROLE_CERTS.get(role_name, [])
+
                 st.markdown(
-                    f'<h4 style="margin-top:1em"><span style="background:{color};color:#fff;'
-                    f'padding:3px 14px;border-radius:14px">{role_name}s</span></h4>',
+                    f'<div style="display:flex;align-items:center;gap:10px;margin:20px 0 8px 0">'
+                    f'<span style="background:{color};color:#fff;padding:3px 14px;border-radius:20px;'
+                    f'font-size:0.82em;font-weight:700">{role_name}s</span></div>',
                     unsafe_allow_html=True,
                 )
-                hcols = st.columns([2] + [1.8] * len(req_cts))
-                hcols[0].markdown("**Employee**")
-                for i, ct in enumerate(req_cts):
-                    hcols[i + 1].markdown(f"**{ct}**")
 
+                cards_html = ""
                 for _, emp in grp.iterrows():
-                    rcols = st.columns([2] + [1.8] * len(req_cts))
-                    rcols[0].write(emp["name"])
-                    for i, ct in enumerate(req_cts):
-                        ec = certs[(certs["employee_id"] == emp["id"]) & (certs["cert_type"] == ct)]
-                        if len(ec) == 0:
-                            rcols[i + 1].markdown("🔴 **Missing**")
+                    cert_pills = ""
+                    emp_has_issue = False
+                    for ct in req_cts:
+                        label, bg, fg, is_issue = cert_status_badge(int(emp["id"]), ct)
+                        if is_issue:
+                            emp_has_issue = True
                             any_issues = True
-                        else:
-                            latest = ec.sort_values("expiry_date", ascending=False).iloc[0]
-                            label, cs = cert_badge(latest["expiry_date"])
-                            rcols[i + 1].markdown(f"**{label}**  \n_{latest['expiry_date'].strftime('%b %d, %Y')}_")
-                            if cs in ("red", "orange"):
-                                any_issues = True
+                        cert_pills += (
+                            f'<div style="display:flex;flex-direction:column;gap:2px;min-width:160px">'
+                            f'<span style="font-size:0.72em;color:#718096;font-weight:600;text-transform:uppercase;'
+                            f'letter-spacing:0.5px">{ct}</span>'
+                            f'<span style="background:{bg};color:{fg};font-size:0.78em;font-weight:600;'
+                            f'padding:3px 10px;border-radius:6px;display:inline-block">{label}</span>'
+                            f'</div>'
+                        )
+                    border_color = "#FCA5A5" if emp_has_issue else "#e2e8f0"
+                    left_bar     = "#EF4444" if emp_has_issue else "#e2e8f0"
+                    cards_html += (
+                        f'<div style="display:flex;align-items:center;gap:20px;background:#fff;'
+                        f'border:1px solid {border_color};border-left:4px solid {left_bar};'
+                        f'border-radius:8px;padding:10px 16px;margin-bottom:8px;flex-wrap:wrap">'
+                        f'<span style="font-weight:700;font-size:0.95em;color:#0F2D52;min-width:140px">'
+                        f'{emp["name"]}</span>'
+                        f'<div style="display:flex;gap:16px;flex-wrap:wrap">{cert_pills}</div>'
+                        f'</div>'
+                    )
+                st.markdown(cards_html, unsafe_allow_html=True)
 
             if any_issues:
-                st.warning("⚠️ Some certifications need attention. Prompt staff to upload renewals via the Employee view.")
+                st.markdown(
+                    '<div style="background:#fff7ed;border:1px solid #FDBA74;border-radius:8px;'
+                    'padding:12px 16px;color:#7c2d12;font-size:0.88em;margin-top:12px">'
+                    '⚠️ Some certifications need attention. Prompt staff to upload renewals via the Employee view.</div>',
+                    unsafe_allow_html=True,
+                )
 
 
     # ── Burnout Monitor ────────────────────────────────────────────────────
@@ -1100,18 +1225,10 @@ if is_manager:
             <strong>6 consecutive days</strong> before a required day off.
             </span>
             <div style="display:flex;gap:18px;margin-top:10px;flex-wrap:wrap">
-                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">
-                    <span style="width:12px;height:12px;border-radius:3px;background:#22C55E;display:inline-block"></span> 1–4 days &nbsp;Healthy
-                </span>
-                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">
-                    <span style="width:12px;height:12px;border-radius:3px;background:#EAB308;display:inline-block"></span> 5 days &nbsp;Caution
-                </span>
-                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">
-                    <span style="width:12px;height:12px;border-radius:3px;background:#F97316;display:inline-block"></span> 6 days &nbsp;At Limit
-                </span>
-                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">
-                    <span style="width:12px;height:12px;border-radius:3px;background:#EF4444;display:inline-block"></span> 7+ days &nbsp;Violation Risk
-                </span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">✅ 1–4 days &nbsp;Healthy</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">🔥 5 days &nbsp;Caution</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">🔥🔥 6 days &nbsp;At Limit</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:0.82em">🔥🔥🔥 7+ days &nbsp;Violation Risk</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -1153,7 +1270,6 @@ if is_manager:
                         any_risk = True
 
                     m = LEVEL_META[level]
-                    max_days = 7
 
                     # Date range string
                     if streak_dates:
@@ -1168,15 +1284,8 @@ if is_manager:
                     else:
                         date_range = "No recent shifts"
 
-                    # Day-dot bar (7 dots max)
-                    dots = ""
-                    for i in range(1, max_days + 1):
-                        filled = i <= streak
-                        dot_color = m["bar"] if filled else "#e2e8f0"
-                        dots += (
-                            f'<span style="width:14px;height:14px;border-radius:50%;'
-                            f'background:{dot_color};display:inline-block;margin-right:4px"></span>'
-                        )
+                    fire_map  = {"ok": "", "caution": "🔥", "warning": "🔥🔥", "danger": "🔥🔥🔥"}
+                    fire_size = {"ok": "1em", "caution": "1.1em", "warning": "1.25em", "danger": "1.4em"}
 
                     # Alert line
                     alert_html = ""
@@ -1201,25 +1310,22 @@ if is_manager:
 
                     streak_text = f"{streak} day{'s' if streak != 1 else ''}" if streak > 0 else "—"
 
-                    cards_html += f"""
-                    <div style="background:{m['bg']};border:1px solid {m['border']};border-left:5px solid {m['bar']};
-                        border-radius:10px;padding:12px 16px;margin-bottom:10px;display:flex;
-                        flex-direction:column;gap:4px">
-                        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-                            <span style="font-weight:700;font-size:0.97em;color:#0F2D52">{emp['name']}</span>
-                            <span style="display:flex;align-items:center;gap:8px">
-                                <span style="background:{m['chip_bg']};color:{m['chip_fg']};font-size:0.75em;
-                                    font-weight:700;padding:2px 10px;border-radius:20px">{m['label']}</span>
-                                <span style="font-size:0.85em;color:#4A5568;font-weight:600">{streak_text} consecutive</span>
-                            </span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;margin-top:4px;flex-wrap:wrap">
-                            <div>{dots}</div>
-                            <span style="font-size:0.8em;color:#718096">{date_range}</span>
-                        </div>
-                        {alert_html}
-                    </div>
-                    """
+                    cards_html += (
+                        f'<div style="background:{m["bg"]};border:1px solid {m["border"]};border-left:5px solid {m["bar"]};'
+                        f'border-radius:10px;padding:12px 16px;margin-bottom:10px">'
+                        f'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px">'
+                        f'<span style="font-weight:700;font-size:0.97em;color:#0F2D52">{emp["name"]}</span>'
+                        f'<span style="display:flex;align-items:center;gap:8px">'
+                        f'<span style="background:{m["chip_bg"]};color:{m["chip_fg"]};font-size:0.75em;font-weight:700;padding:2px 10px;border-radius:20px">{m["label"]}</span>'
+                        f'<span style="font-size:0.85em;color:#4A5568;font-weight:600">{streak_text} consecutive</span>'
+                        f'</span></div>'
+                        f'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+                        + (f'<span style="font-size:{fire_size[level]};letter-spacing:2px">{fire_map[level]}</span>' if level != "ok" else '')
+                        + f'<span style="font-size:0.8em;color:#718096">{date_range}</span>'
+                        f'</div>'
+                        + alert_html
+                        + '</div>'
+                    )
 
                 st.markdown(cards_html, unsafe_allow_html=True)
 
@@ -1267,7 +1373,7 @@ else:
     st.divider()
 
     tab_my_shifts, tab_swap_req, tab_my_certs = st.tabs([
-        "📅 My Shifts", "🔄 Request Swap", "🎓 My Certifications"
+        "📅 My Shifts", "🔄 Request Swap", "🏅 My Certifications"
     ])
 
     with tab_my_shifts:
