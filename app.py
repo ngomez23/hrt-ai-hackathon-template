@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta, date, time
 import os
+import json
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="SmartSchedules", layout="wide")
 
@@ -59,24 +61,37 @@ def inject_theme():
         color: #ffffff !important;
     }
 
-    /* ── Venues tab (2): green location pin ── */
-    .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-child(2)::before {
+    /* ── Management tabs (7-tab list) ── */
+    .stTabs [data-baseweb="tab-list"]:has([data-baseweb="tab"]:nth-child(7)) [data-baseweb="tab"]:nth-child(2)::before {
         content: " ";
         display: inline-block; width: 14px; height: 14px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5S10.6 6.5 12 6.5s2.5 1.1 2.5 2.5S13.4 11.5 12 11.5z' fill='%2322C55E'/%3E%3C/svg%3E");
         background-size: contain; background-repeat: no-repeat; background-position: center;
         margin-right: 5px; vertical-align: middle;
     }
-    /* ── Swap Requests tab (5): gold right + blue left arrows ── */
-    .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-child(5)::before {
+    .stTabs [data-baseweb="tab-list"]:has([data-baseweb="tab"]:nth-child(7)) [data-baseweb="tab"]:nth-child(5)::before {
         content: " ";
         display: inline-block; width: 20px; height: 13px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16'%3E%3Cline x1='1' y1='4' x2='13' y2='4' stroke='%23F5A623' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpolyline points='10%2C1 13%2C4 10%2C7' fill='none' stroke='%23F5A623' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='19' y1='12' x2='7' y2='12' stroke='%231E88E5' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpolyline points='10%2C9 7%2C12 10%2C15' fill='none' stroke='%231E88E5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
         background-size: contain; background-repeat: no-repeat; background-position: center;
         margin-right: 5px; vertical-align: middle;
     }
-    /* ── Certifications tab (6): gold 8-point starburst + navy checkmark ── */
-    .stTabs [data-baseweb="tab-list"] [data-baseweb="tab"]:nth-child(6)::before {
+    .stTabs [data-baseweb="tab-list"]:has([data-baseweb="tab"]:nth-child(7)) [data-baseweb="tab"]:nth-child(6)::before {
+        content: " ";
+        display: inline-block; width: 15px; height: 15px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='12,0.5 14.94,2.97 18.76,2.70 19.69,6.41 22.94,8.45 21.5,12 22.94,15.55 19.69,17.59 18.76,21.30 14.94,21.03 12,23.5 9.06,21.03 5.24,21.30 4.31,17.59 1.06,15.55 2.5,12 1.06,8.45 4.31,6.41 5.24,2.70 9.06,2.97' fill='%23D4A017'/%3E%3Cpolyline points='8.5,12 10.8,14.8 15.5,9' fill='none' stroke='%230F2D52' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-size: contain; background-repeat: no-repeat; background-position: center;
+        margin-right: 5px; vertical-align: middle;
+    }
+    /* ── Employee tabs (3-tab list): swap arrows + cert seal ── */
+    .stTabs [data-baseweb="tab-list"]:has([data-baseweb="tab"]:nth-child(3)):not(:has([data-baseweb="tab"]:nth-child(4))) [data-baseweb="tab"]:nth-child(2)::before {
+        content: " ";
+        display: inline-block; width: 20px; height: 13px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16'%3E%3Cline x1='1' y1='4' x2='13' y2='4' stroke='%23F5A623' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpolyline points='10%2C1 13%2C4 10%2C7' fill='none' stroke='%23F5A623' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='19' y1='12' x2='7' y2='12' stroke='%231E88E5' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpolyline points='10%2C9 7%2C12 10%2C15' fill='none' stroke='%231E88E5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-size: contain; background-repeat: no-repeat; background-position: center;
+        margin-right: 5px; vertical-align: middle;
+    }
+    .stTabs [data-baseweb="tab-list"]:has([data-baseweb="tab"]:nth-child(3)):not(:has([data-baseweb="tab"]:nth-child(4))) [data-baseweb="tab"]:nth-child(3)::before {
         content: " ";
         display: inline-block; width: 15px; height: 15px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='12,0.5 14.94,2.97 18.76,2.70 19.69,6.41 22.94,8.45 21.5,12 22.94,15.55 19.69,17.59 18.76,21.30 14.94,21.03 12,23.5 9.06,21.03 5.24,21.30 4.31,17.59 1.06,15.55 2.5,12 1.06,8.45 4.31,6.41 5.24,2.70 9.06,2.97' fill='%23D4A017'/%3E%3Cpolyline points='8.5,12 10.8,14.8 15.5,9' fill='none' stroke='%230F2D52' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -183,17 +198,20 @@ VENUE_TYPES = [
     "Banquet Hall", "Café", "Room Service", "Event Space", "Patio/Terrace", "Other",
 ]
 
-ROLES = ["Server", "Bartender", "Host/Hostess", "Cook", "Busser", "Expeditor", "Supervisor", "Manager"]
+ROLES = ["Host/Hostess", "Busser", "Server", "Bartender", "Expeditor", "Cook", "Supervisor", "Manager"]
 
 ROLE_COLORS = {
-    "Server":       "#2878BE",   # sky blue
-    "Bartender":    "#6B4FBB",   # indigo
-    "Host/Hostess": "#0D9B7D",   # teal
-    "Cook":         "#D4870A",   # dark amber
-    "Busser":       "#3D7EAA",   # ocean blue
-    "Expeditor":    "#2D6A4F",   # forest green
-    "Supervisor":   "#4A5E7A",   # slate blue
-    "Manager":      "#0F2D52",   # navy  (matches logo)
+    # Front of House — cool primaries/secondaries
+    "Host/Hostess": "#1A9E6E",   # green (secondary)
+    "Busser":       "#00AEEF",   # bright sky blue
+    "Server":       "#1E5FA8",   # blue (primary)
+    "Bartender":    "#6A3499",   # violet (secondary)
+    # Back of House — warm primaries/secondaries
+    "Expeditor":    "#D4680A",   # orange (secondary)
+    "Cook":         "#B02820",   # red (primary)
+    # Management — black scale
+    "Supervisor":   "#3A3A3A",   # dark charcoal
+    "Manager":      "#111111",   # near black
 }
 
 ROLE_CERTS = {
@@ -403,11 +421,11 @@ def burnout_level(streak):
 def cert_badge(expiry_date):
     today = date.today()
     if expiry_date < today:
-        return "🔴 Expired", "red"
+        return '<span style="color:#DC2626;font-weight:700">Expired</span>', "red"
     days_left = (expiry_date - today).days
     if days_left <= ALERT_DAYS:
-        return f"🟡 Expires in {days_left}d", "orange"
-    return f"🟢 Valid ({days_left}d left)", "green"
+        return f'<span style="color:#D97706;font-weight:700">Expiring Soon — {days_left} days left</span>', "orange"
+    return '<span style="color:#16A34A;font-weight:700">Valid</span>', "green"
 
 def emp_cert_issues(emp_id, role, certs_df):
     issues = []
@@ -488,6 +506,11 @@ for key, default in [
     ("vis_emp_id", None),
     ("vis_week_start", None),
     ("vis_schedule_day", None),
+    ("vis_move_shift_id", None),
+    ("vis_move_confirm", None),
+    ("vis_dnd_ts", 0),
+    ("vis_dnd_emp_id", None),
+    ("vis_dnd_start", None),
     ("training_mode", False),
     ("jump_to_tab", None),
     ("mgr_tab", "Employees"),
@@ -512,11 +535,7 @@ venues    = load_venues()
 with st.sidebar:
     st.markdown(logo_html(width="200px"), unsafe_allow_html=True)
     st.divider()
-    # Sync view from URL query param (set when user clicks a view-selector link)
-    _qp = st.query_params
-    if "view" in _qp and _qp["view"] in ("Manager", "Employee"):
-        st.session_state.view_mode = _qp["view"]
-    elif "view_mode" not in st.session_state:
+    if "view_mode" not in st.session_state:
         st.session_state.view_mode = "Manager"
 
     is_mgr = st.session_state.view_mode == "Manager"
@@ -527,18 +546,18 @@ with st.sidebar:
                     '<circle cx="7.5" cy="7.5" r="2.6" fill="white"/>')
         return '<circle cx="7.5" cy="7.5" r="6" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.8"/>'
 
-    def _vlink(label, target, active):
-        w = "600" if active else "400"
-        return (
-            f'<a class="view-link" href="?view={target}" '
-            f'style="font-weight:{w};">'
-            f'<svg width="15" height="15" viewBox="0 0 15 15" style="flex-shrink:0;">'
-            f'{_dot(active)}</svg>{label}</a>'
-        )
-
     st.markdown('<p style="font-weight:600;color:white;margin:0 0 4px 0;font-size:0.9rem;">View as</p>',
                 unsafe_allow_html=True)
-    st.markdown(_vlink("Manager", "Manager", is_mgr), unsafe_allow_html=True)
+
+    _vcols = st.columns(2)
+    if _vcols[0].button("Manager", type="primary" if is_mgr else "secondary",
+                        use_container_width=True, key="vbtn_mgr"):
+        st.session_state.view_mode = "Manager"
+        st.rerun()
+    if _vcols[1].button("Employee", type="primary" if not is_mgr else "secondary",
+                        use_container_width=True, key="vbtn_emp"):
+        st.session_state.view_mode = "Employee"
+        st.rerun()
 
     if is_mgr:
         training_on = st.toggle(
@@ -554,8 +573,6 @@ with st.sidebar:
                 '&nbsp;&nbsp;Cert checks disabled</span>',
                 unsafe_allow_html=True,
             )
-
-    st.markdown(_vlink("Employee", "Employee", not is_mgr), unsafe_allow_html=True)
 
     mode = "Manager" if is_mgr else "Employee"
 
@@ -796,216 +813,418 @@ if is_manager:
         else:
             today       = datetime.today().date()
             default_mon = today - timedelta(days=today.weekday())
-
-            # Week picker at top
-            week_start = st.date_input(
-                "Week (Monday)", value=default_mon, key="vis_wk",
-                help="Navigate to any week to schedule shifts."
-            )
-            week_end = week_start + timedelta(days=6)
-            st.caption(
-                f"Scheduling week: **{week_start.strftime('%B %d')} – {week_end.strftime('%B %d, %Y')}**  ·  "
-                "Click an employee on the left, then click a day to schedule."
-            )
-            st.divider()
-
-            # Save week to session so the form can read it
+            week_start  = st.date_input("Week (Monday)", value=default_mon, key="vis_wk")
             st.session_state.vis_week_start = week_start
 
-            # Filter shifts for this week
-            ws = shifts.copy()
-            ws["shift_date"] = ws["start_datetime"].dt.date
-            ws = ws[(ws["shift_date"] >= week_start) & (ws["shift_date"] <= week_end)]
-            if len(ws) > 0 and len(employees) > 0:
-                ws = ws.merge(employees[["id", "name", "role"]], left_on="employee_id", right_on="id", suffixes=("", "_e"))
+            # Day selector pills
+            _day_labels = [(week_start + timedelta(days=i)).strftime("%a %-m/%-d") for i in range(7)]
+            _day_dates  = [week_start + timedelta(days=i) for i in range(7)]
+            _sel_day_idx = st.session_state.get("vis_day_idx", 0)
+            # Scroll to today if it falls in this week
+            for _di, _dd in enumerate(_day_dates):
+                if _dd == today:
+                    _sel_day_idx = _di
+                    st.session_state.vis_day_idx = _di
+                    break
+            _pill_cols = st.columns(7)
+            for _pi, _pl in enumerate(_day_labels):
+                _is_today = (_day_dates[_pi] == today)
+                _is_sel   = (_pi == _sel_day_idx)
+                _pill_style = (
+                    "primary" if _is_sel else "secondary"
+                )
+                if _pill_cols[_pi].button(
+                    ("📅 " if _is_today else "") + _pl,
+                    key=f"vis_day_pill_{_pi}",
+                    type=_pill_style,
+                    use_container_width=True,
+                ):
+                    st.session_state.vis_day_idx = _pi
+                    st.session_state.vis_schedule_day = None
+                    st.rerun()
+            _sel_day_idx = st.session_state.get("vis_day_idx", 0)
+            _view_date   = _day_dates[_sel_day_idx]
 
-            # Layout: employee panel | calendar grid
-            left, right = st.columns([2, 7], gap="medium")
+            # Gather shifts for this day
+            _training = st.session_state.get("training_mode", False)
+            _day_shifts_raw = shifts.copy()
+            _day_shifts_raw["shift_date"] = _day_shifts_raw["start_datetime"].dt.date
+            _day_shifts_raw = _day_shifts_raw[_day_shifts_raw["shift_date"] == _view_date]
+            if len(_day_shifts_raw) > 0:
+                _day_shifts_raw = _day_shifts_raw.merge(
+                    employees[["id","name","role"]], left_on="employee_id", right_on="id", suffixes=("","_e"))
 
-            # ── Employee Roster Panel ──────────────────────────────────────
-            with left:
-                st.markdown("**Click an employee to select them, then click a day to schedule.**")
-                st.markdown("")
-                sel_id = st.session_state.vis_emp_id
+            # Build employee list
+            _emp_list = []
+            for _, _e in employees.iterrows():
+                _can, _ = check_employee_schedulable(int(_e["id"]), _e["role"], certs)
+                _emp_list.append({
+                    "id": int(_e["id"]), "name": _e["name"], "role": _e["role"],
+                    "color": ROLE_COLORS.get(_e["role"], "#888"),
+                    "locked": not _training and not _can,
+                })
 
-                for role_name in ROLES:
-                    grp = employees[employees["role"] == role_name].sort_values("name")
-                    if len(grp) == 0:
-                        continue
-                    color = ROLE_COLORS.get(role_name, "#888")
-                    st.markdown(
-                        f'<div style="background:{color};color:#fff;padding:2px 8px;'
-                        f'border-radius:8px;font-size:0.78em;font-weight:700;margin-bottom:4px">'
-                        f'{role_name}</div>',
-                        unsafe_allow_html=True,
-                    )
-                    for _, emp in grp.iterrows():
-                        is_sel     = (sel_id == int(emp["id"]))
-                        can_sched, _ = check_employee_schedulable(int(emp["id"]), emp["role"], certs)
-                        training   = st.session_state.get("training_mode", False)
-                        locked     = not training and not can_sched
-                        prefix     = "✓ " if is_sel else ("🔒 " if locked else "")
-                        label      = f"{prefix}{emp['name']}"
-                        btn_type   = "primary" if is_sel else "secondary"
+            _TSTART, _TEND = 6, 24
+            _TSPAN = _TEND - _TSTART
+            _is_past_day = (_view_date < today)
+
+            # ── Two-column layout: roster | timeline ──────────────────────
+            _vis_left, _vis_right = st.columns([1, 4], gap="small")
+
+            _sel_roster_id = st.session_state.get("vis_dnd_emp_id")
+
+            with _vis_left:
+                st.markdown(
+                    '<p style="font-size:.75em;font-weight:700;color:#64748b;'
+                    'letter-spacing:.5px;margin-bottom:4px">STAFF ROSTER</p>',
+                    unsafe_allow_html=True,
+                )
+                _cur_role_r = None
+                _sorted_roster = sorted(
+                    _emp_list,
+                    key=lambda e: (ROLES.index(e["role"]) if e["role"] in ROLES else 99, e["name"])
+                )
+                for _er in _sorted_roster:
+                    if _er["role"] != _cur_role_r:
+                        _cur_role_r = _er["role"]
+                        st.markdown(
+                            f'<div style="background:{_er["color"]};color:#fff;font-size:.63em;'
+                            f'font-weight:700;padding:2px 7px;border-radius:4px;'
+                            f'margin:8px 0 3px;letter-spacing:.3px">{_cur_role_r}</div>',
+                            unsafe_allow_html=True,
+                        )
+                    _is_sel  = (_sel_roster_id == _er["id"])
+                    _is_lock = _er["locked"]
+                    _label   = ("🔒 " if _is_lock else "") + _er["name"]
+                    if _is_lock:
+                        st.markdown(
+                            f'<div style="font-size:.77em;color:#9ca3af;padding:4px 6px;'
+                            f'margin-bottom:3px;border:1px solid #fee2e2;border-radius:5px;'
+                            f'background:#fff1f2">{_label}</div>',
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        _btn_type = "primary" if _is_sel else "secondary"
                         if st.button(
-                            label, key=f"vis_emp_{emp['id']}",
-                            use_container_width=True, type=btn_type,
-                            disabled=locked,
-                            help="Missing or expired certifications — cannot schedule in Production Mode" if locked else None,
+                            _label,
+                            key=f"vis_roster_{_er['id']}",
+                            type=_btn_type,
+                            use_container_width=True,
                         ):
-                            if is_sel:
-                                st.session_state.vis_emp_id       = None
+                            if _is_sel:
+                                # Deselect
+                                st.session_state.vis_dnd_emp_id   = None
                                 st.session_state.vis_schedule_day = None
                             else:
-                                st.session_state.vis_emp_id       = int(emp["id"])
+                                st.session_state.vis_dnd_emp_id   = _er["id"]
                                 st.session_state.vis_schedule_day = None
+                            st.session_state.vis_dnd_start = None
                             st.rerun()
-                        if locked:
-                            st.markdown(
-                                '<span style="color:#F5A623;font-size:0.72em;margin-left:4px">'
-                                'Cert issue — see Certifications tab</span>',
-                                unsafe_allow_html=True,
-                            )
 
-                if sel_id is not None:
-                    sel_row = employees[employees["id"] == sel_id]
-                    if len(sel_row):
-                        sel_name = sel_row.iloc[0]["name"]
-                        sel_role = sel_row.iloc[0]["role"]
-                        st.divider()
-                        st.markdown(
-                            f'**Selected:** {sel_name}  \n'
-                            f'{role_pill(sel_role)}',
-                            unsafe_allow_html=True,
+            with _vis_right:
+                # ── Timeline display ──────────────────────────────────────
+                def _hour_lbl(hh):
+                    if hh == 12: return "12pm"
+                    if hh == 24: return "12am"
+                    return f"{hh % 12 or 12}{'am' if hh < 12 else 'pm'}"
+
+                def _pct(h): return (h - _TSTART) / _TSPAN * 100
+
+                _hdr_divs = "".join(
+                    f'<div style="position:absolute;left:{_pct(hh):.2f}%;'
+                    f'transform:translateX(-50%);font-size:.62em;color:#6b7280;font-weight:500;white-space:nowrap">'
+                    f'{_hour_lbl(hh)}</div>'
+                    for hh in range(_TSTART, _TEND + 1, 2)
+                )
+
+                _now_line_html = ""
+                if _view_date == today:
+                    _n = datetime.now()
+                    _nh = _n.hour + _n.minute / 60
+                    if _TSTART <= _nh <= _TEND:
+                        _np = _pct(_nh)
+                        _now_line_html = (
+                            f'<div style="position:absolute;top:0;bottom:0;left:{_np:.2f}%;'
+                            f'width:2px;background:#ef4444;opacity:.7;z-index:4;pointer-events:none">'
+                            f'<div style="position:absolute;top:-17px;left:50%;transform:translateX(-50%);'
+                            f'background:#ef4444;color:#fff;font-size:.58em;font-weight:700;'
+                            f'padding:1px 4px;border-radius:3px;white-space:nowrap">'
+                            f'{_n.strftime("%-I:%M %p")}</div></div>'
                         )
-                        streak, s_dates = get_consecutive_streak(sel_id, shifts)
-                        level, icon = burnout_level(streak)
-                        if streak >= BURNOUT_CAUTION:
-                            st.warning(f"{icon} {streak} consecutive days scheduled")
 
-            # ── Calendar Grid ──────────────────────────────────────────────
-            with right:
-                days     = [week_start + timedelta(days=i) for i in range(7)]
-                day_cols = st.columns(7)
-
-                for col_idx, (day, dcol) in enumerate(zip(days, day_cols)):
-                    is_today = (day == today)
-                    header_style = (
-                        "background:#1E88E5;color:#fff;padding:4px 6px;border-radius:6px;text-align:center"
-                        if is_today else
-                        "background:#f0f2f6;padding:4px 6px;border-radius:6px;text-align:center"
-                    )
-                    dcol.markdown(
-                        f'<div style="{header_style}"><b>{day.strftime("%a")}</b><br>'
-                        f'<span style="font-size:0.85em">{day.strftime("%-m/%-d")}</span></div>',
-                        unsafe_allow_html=True,
-                    )
-
-                    # Existing shift cards for this day
-                    day_ws = ws[ws["shift_date"] == day] if len(ws) > 0 else pd.DataFrame()
-                    for _, sr in day_ws.iterrows():
-                        v_name = None
-                        if pd.notna(sr.get("venue_id")) and len(venues) > 0:
-                            v_row = venues[venues["id"] == int(sr["venue_id"])]
-                            v_name = v_row.iloc[0]["name"] if len(v_row) else None
-                        dcol.markdown(
-                            shift_card_html(sr["name"], sr["role"], sr["start_datetime"], sr["end_datetime"], venue_name=v_name),
-                            unsafe_allow_html=True,
+                _rows_html = ""
+                _cur_role_t = None
+                _row_idx = 0
+                for _et in sorted(
+                    _emp_list,
+                    key=lambda e: (ROLES.index(e["role"]) if e["role"] in ROLES else 99, e["name"])
+                ):
+                    if _et["role"] != _cur_role_t:
+                        _cur_role_t = _et["role"]
+                        _rc = ROLE_COLORS.get(_cur_role_t, "#888")
+                        _rows_html += (
+                            f'<div style="display:flex;align-items:center;margin:7px 0 2px">'
+                            f'<div style="background:{_rc};color:#fff;font-size:.63em;font-weight:700;'
+                            f'letter-spacing:.3px;padding:2px 7px;border-radius:4px;white-space:nowrap;'
+                            f'margin-right:6px">{_cur_role_t}</div>'
+                            f'<div style="flex:1;height:1px;background:#e5e7eb"></div></div>'
                         )
-                        if dcol.button("🗑", key=f"vis_del_{sr['id']}_{col_idx}", help="Remove shift"):
-                            shifts = shifts[shifts["id"] != sr["id"]]
+
+                    _row_bg = "#f8fafc" if _row_idx % 2 == 0 else "#ffffff"
+                    _row_idx += 1
+                    _lock_html = '<span style="color:#ef4444;font-size:.75em"> 🔒</span>' if _et["locked"] else ""
+
+                    _blks = ""
+                    if len(_day_shifts_raw) > 0:
+                        _es = _day_shifts_raw[_day_shifts_raw["employee_id"] == _et["id"]]
+                        for _, _sr in _es.iterrows():
+                            _vn = None
+                            if pd.notna(_sr.get("venue_id")) and len(venues) > 0:
+                                _vr = venues[venues["id"] == int(_sr["venue_id"])]
+                                _vn = _vr.iloc[0]["name"] if len(_vr) else None
+                            _sdt = pd.Timestamp(_sr["start_datetime"])
+                            _edt = pd.Timestamp(_sr["end_datetime"])
+                            _sh = _sdt.hour + _sdt.minute / 60
+                            _eh = _edt.hour + _edt.minute / 60
+                            if _eh <= _sh: _eh = _TEND
+                            _l = max(_TSTART, _sh); _r = min(_TEND, _eh)
+                            if _r > _l:
+                                _lbl = f"{_sdt.strftime('%-I:%M %p')}–{_edt.strftime('%-I:%M %p')}"
+                                if _vn: _lbl += f" · {_vn}"
+                                _blks += (
+                                    f'<div style="position:absolute;top:5px;bottom:5px;'
+                                    f'left:{_pct(_l):.2f}%;width:{(_r-_l)/_TSPAN*100:.2f}%;'
+                                    f'background:{_et["color"]};border-radius:4px;color:#fff;'
+                                    f'font-size:.69em;font-weight:600;padding:2px 5px;overflow:hidden;'
+                                    f'white-space:nowrap;text-overflow:ellipsis;'
+                                    f'border-left:3px solid rgba(0,0,0,.18)" title="{_lbl}">{_lbl}</div>'
+                                )
+
+                    _gridlines = "".join(
+                        f'<div style="position:absolute;top:0;bottom:0;left:{_pct(hh):.2f}%;'
+                        f'border-left:1px solid {"#e5e7eb" if (hh-_TSTART)%2==0 else "#f3f4f6"}"></div>'
+                        for hh in range(_TSTART, _TEND + 1)
+                    )
+
+                    _rows_html += (
+                        f'<div style="display:flex;align-items:stretch;min-height:40px;background:{_row_bg};'
+                        f'border-radius:4px;margin-bottom:2px;border:1px solid #f1f5f9">'
+                        f'<div style="width:110px;flex-shrink:0;padding:4px 8px;font-size:.77em;'
+                        f'font-weight:600;color:#374151;display:flex;align-items:center;'
+                        f'border-right:1px solid #e5e7eb">{_et["name"]}{_lock_html}</div>'
+                        f'<div style="flex:1;position:relative">{_gridlines}{_now_line_html}{_blks}</div>'
+                        f'</div>'
+                    )
+
+                _n_roles_t = len(set(e["role"] for e in _emp_list))
+                _tl_height = max(220, 36 + len(_emp_list) * 44 + _n_roles_t * 32)
+
+                _full_html = f"""<style>
+body{{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:transparent;overflow:hidden}}
+</style>
+<div style="padding:4px 0 6px">
+  <div style="position:relative;height:22px;margin-left:110px;
+    border-bottom:2px solid #e5e7eb;margin-bottom:2px">{_hdr_divs}</div>
+  {_rows_html}
+</div>"""
+                components.html(_full_html, height=_tl_height, scrolling=False)
+
+            # ── Status / caption ──────────────────────────────────────────
+            st.caption(
+                f"Showing **{_view_date.strftime('%A, %B %d')}** · "
+                f"{len(_day_shifts_raw)} shift(s) scheduled"
+                + (f" · **Click a staff name** to select them, then pick a start time"
+                   if not _is_past_day and _sel_roster_id is None else "")
+            )
+
+            # ── Time-slot quick-picker (shown after roster selection) ─────
+            _sel_roster_id = st.session_state.get("vis_dnd_emp_id")
+            if _sel_roster_id and not _is_past_day:
+                _sel_row = employees[employees["id"] == _sel_roster_id]
+                _sel_name = _sel_row.iloc[0]["name"] if len(_sel_row) else "?"
+                _sel_color = ROLE_COLORS.get(
+                    _sel_row.iloc[0]["role"] if len(_sel_row) else "", "#1E88E5"
+                )
+                st.markdown(
+                    f'<div style="background:{_sel_color}18;border:1.5px solid {_sel_color}44;'
+                    f'border-radius:8px;padding:8px 12px;margin:6px 0 4px;font-size:.85em;'
+                    f'font-weight:600;color:{_sel_color}">'
+                    f'▸ {_sel_name} selected — pick a start time to schedule their shift:</div>',
+                    unsafe_allow_html=True,
+                )
+                _slot_hours = list(range(6, 23))  # 6am to 10pm
+                _slot_cols = st.columns(len(_slot_hours))
+                for _si, _sh in enumerate(_slot_hours):
+                    _sl = _hour_lbl(_sh)
+                    if _slot_cols[_si].button(_sl, key=f"vis_slot_{_sh}", use_container_width=True):
+                        st.session_state.vis_dnd_start    = time(_sh, 0)
+                        st.session_state.vis_schedule_day = _view_date
+                        st.rerun()
+
+            # ── Manual add button (no selection needed) ───────────────────
+            if not _is_past_day:
+                _btn_label = "＋ Add Shift on " + _view_date.strftime("%A")
+                if st.button(_btn_label, type="primary" if not _sel_roster_id else "secondary",
+                             key="vis_open_form"):
+                    st.session_state.vis_schedule_day = _view_date
+                    st.session_state.vis_dnd_start    = None
+                    st.rerun()
+
+            # ── Move-confirm dialog ───────────────────────────────────────
+            _mv = st.session_state.get("vis_move_confirm")
+            if _mv:
+                _mvr = shifts[shifts["id"] == _mv["shift_id"]]
+                if len(_mvr):
+                    _msr = _mvr.iloc[0]
+                    _mve = employees[employees["id"] == _msr["employee_id"]]
+                    _mvn = _mve.iloc[0]["name"] if len(_mve) else "?"
+                    _old_d, _new_d = pd.Timestamp(_msr["start_datetime"]).date(), _mv["new_day"]
+                    st.warning(f"Move **{_mvn}'s** shift from "
+                               f"**{_old_d.strftime('%A %b %d')}** → **{_new_d.strftime('%A %b %d')}**?")
+                    _ya, _na, _ = st.columns([2, 2, 5])
+                    if _ya.button("✅ Yes, move it", type="primary", key="vis_mv_yes"):
+                        _delta = (_new_d - _old_d).days
+                        _idx   = shifts.index[shifts["id"] == _mv["shift_id"]][0]
+                        shifts.at[_idx,"start_datetime"] = pd.Timestamp(_msr["start_datetime"]) + timedelta(days=_delta)
+                        shifts.at[_idx,"end_datetime"]   = pd.Timestamp(_msr["end_datetime"])   + timedelta(days=_delta)
+                        shifts.at[_idx,"date"]           = _new_d.isoformat()
+                        save_shifts(shifts)
+                        st.session_state.vis_move_confirm = None
+                        st.rerun()
+                    if _na.button("Cancel", key="vis_mv_no"):
+                        st.session_state.vis_move_confirm = None
+                        st.rerun()
+                else:
+                    st.session_state.vis_move_confirm = None
+
+            # ── Add-shift form ────────────────────────────────────────────
+            sel_day = st.session_state.get("vis_schedule_day")
+            if sel_day is not None:
+                _avail = {e["name"]: e["id"] for e in _emp_list if not e["locked"]}
+                if not _avail:
+                    st.warning("No employees available to schedule.")
+                else:
+                    st.divider()
+                    _dnd_emp_id   = st.session_state.get("vis_dnd_emp_id")
+                    _dnd_start_t  = st.session_state.get("vis_dnd_start")
+                    _avail_names  = list(_avail.keys())
+                    # Pre-select DnD employee if set
+                    _dnd_emp_name = None
+                    if _dnd_emp_id:
+                        _dnd_row = employees[employees["id"] == _dnd_emp_id]
+                        if len(_dnd_row):
+                            _dnd_emp_name = _dnd_row.iloc[0]["name"]
+                    _default_emp_idx = (
+                        _avail_names.index(_dnd_emp_name)
+                        if _dnd_emp_name and _dnd_emp_name in _avail_names else 0
+                    )
+                    st.markdown(f"### Add Shift — {sel_day.strftime('%A, %B %d')}")
+                    with st.form("vis_shift_form"):
+                        v_emp_label = st.selectbox("Employee", _avail_names, index=_default_emp_idx)
+                        sel_id  = _avail[v_emp_label]
+                        sel_emp = employees[employees["id"] == sel_id].iloc[0]
+                        fc1, fc2 = st.columns(2)
+                        _default_start = _dnd_start_t if _dnd_start_t else time(9, 0)
+                        # Default end = start + 8h, capped at 23:00
+                        _default_end_h = min(23, _default_start.hour + 8)
+                        _default_end   = time(_default_end_h, _default_start.minute)
+                        v_start = fc1.time_input("Start Time", value=_default_start, step=900)
+                        v_end   = fc2.time_input("End Time",   value=_default_end,   step=900)
+                        venue_opts = {"— No venue assigned —": None}
+                        venue_opts.update({v["name"]: int(v["id"]) for _, v in venues.iterrows()})
+                        v_venue_label = st.selectbox("Venue / Station", list(venue_opts.keys()))
+                        v_notes = st.text_input("Notes (optional)")
+                        sc1, sc2 = st.columns(2)
+                        confirm = sc1.form_submit_button("✅ Add Shift", type="primary", use_container_width=True)
+                        cancel  = sc2.form_submit_button("Cancel", use_container_width=True)
+                        if cancel:
+                            st.session_state.vis_schedule_day = None
+                            st.session_state.vis_dnd_emp_id   = None
+                            st.session_state.vis_dnd_start    = None
+                            st.rerun()
+                        if confirm:
+                            start_dt = datetime.combine(sel_day, v_start)
+                            end_dt   = datetime.combine(
+                                sel_day + timedelta(days=1) if v_end <= v_start else sel_day, v_end)
+                            hours = (end_dt - start_dt).total_seconds() / 3600
+                            training = st.session_state.get("training_mode", False)
+                            can_sched, cert_issues = check_employee_schedulable(sel_id, sel_emp["role"], certs)
+                            if not training and not can_sched:
+                                st.error("Cert issue:\n\n" + "\n".join(f"- {i}" for i in cert_issues))
+                            elif hours > 16:
+                                st.error(f"🚫 {hours:.1f}h exceeds the 16-hour maximum.")
+                            else:
+                                viol, reason = check_turnaround(sel_id, start_dt, end_dt, shifts)
+                                if viol:
+                                    st.error(f"🚫 8h turnaround: {reason}")
+                                else:
+                                    new_shift = pd.DataFrame([{
+                                        "id": next_id(shifts), "employee_id": sel_id,
+                                        "date": sel_day.isoformat(),
+                                        "start_datetime": start_dt, "end_datetime": end_dt,
+                                        "notes": v_notes.strip(),
+                                        "venue_id": venue_opts[v_venue_label],
+                                    }])
+                                    shifts = pd.concat([shifts, new_shift], ignore_index=True)
+                                    save_shifts(shifts)
+                                    new_streak, _ = get_consecutive_streak(sel_id, shifts)
+                                    lvl, b_icon   = burnout_level(new_streak)
+                                    st.session_state.vis_schedule_day = None
+                                    st.session_state.vis_dnd_emp_id   = None
+                                    st.session_state.vis_dnd_start    = None
+                                    if hours > 8:
+                                        st.warning(f"⚠️ Saved — {hours:.1f}h is a long shift.")
+                                    if lvl != "ok":
+                                        st.warning(f"Shift added. {b_icon} **{sel_emp['name']}** now "
+                                                   f"has **{new_streak} consecutive days**.")
+                                    st.rerun()
+
+            # ── Move / remove this day's shifts ───────────────────────────
+            if len(_day_shifts_raw) > 0:
+                with st.expander("Move or remove a shift on this day"):
+                    for _, _sr2 in _day_shifts_raw.iterrows():
+                        _st2 = pd.Timestamp(_sr2["start_datetime"])
+                        _et2 = pd.Timestamp(_sr2["end_datetime"])
+                        _lbl2 = f"{_sr2['name']} · {_st2.strftime('%-I:%M %p')}–{_et2.strftime('%-I:%M %p')}"
+                        _ec2  = ROLE_COLORS.get(_sr2["role"], "#888")
+                        _ra, _rb, _rc3 = st.columns([5, 2, 1])
+                        _ra.markdown(
+                            f'<div style="background:{_ec2};color:#fff;border-radius:4px;padding:4px 8px;font-size:.82em;font-weight:600">{_lbl2}</div>',
+                            unsafe_allow_html=True)
+                        if _rb.button("Move to day…", key=f"vis_mv_open_{int(_sr2['id'])}"):
+                            st.session_state.vis_move_confirm  = None
+                            st.session_state.vis_move_shift_id = int(_sr2["id"])
+                            st.rerun()
+                        if _rc3.button("✕", key=f"vis_rm_{int(_sr2['id'])}"):
+                            shifts = shifts[shifts["id"] != int(_sr2["id"])]
                             save_shifts(shifts)
                             st.rerun()
 
-                    # "+" button — only when an employee is selected
-                    if st.session_state.vis_emp_id is not None:
-                        if dcol.button("＋", key=f"vis_add_{col_idx}", use_container_width=True, help=f"Schedule on {day.strftime('%b %d')}"):
-                            st.session_state.vis_schedule_day = day
-                            st.rerun()
-
-                # ── Inline scheduling form (appears below grid) ────────────
-                sel_id  = st.session_state.vis_emp_id
-                sel_day = st.session_state.vis_schedule_day
-
-                if sel_id is not None and sel_day is not None:
-                    sel_row = employees[employees["id"] == sel_id]
-                    if len(sel_row):
-                        sel_emp = sel_row.iloc[0]
-                        st.divider()
-                        st.markdown(
-                            f"### Schedule **{sel_emp['name']}** on "
-                            f"{sel_day.strftime('%A, %B %d')}"
-                        )
-                        with st.form("vis_shift_form"):
-                            fc1, fc2 = st.columns(2)
-                            v_start = fc1.time_input("Start Time", value=time(9, 0), step=900)
-                            v_end   = fc2.time_input("End Time",   value=time(17, 0), step=900)
-                            venue_opts = {"— No venue assigned —": None}
-                            venue_opts.update({v["name"]: int(v["id"]) for _, v in venues.iterrows()})
-                            v_venue_label = st.selectbox("Venue / Station", list(venue_opts.keys()))
-                            v_notes = st.text_input("Notes (optional)")
-                            sc1, sc2 = st.columns(2)
-                            confirm = sc1.form_submit_button("✅ Add Shift", type="primary", use_container_width=True)
-                            cancel  = sc2.form_submit_button("Cancel", use_container_width=True)
-
-                            if cancel:
-                                st.session_state.vis_schedule_day = None
-                                st.rerun()
-
-                            if confirm:
-                                start_dt = datetime.combine(sel_day, v_start)
-                                end_dt   = datetime.combine(
-                                    sel_day + timedelta(days=1) if v_end <= v_start else sel_day, v_end
-                                )
-                                hours    = (end_dt - start_dt).total_seconds() / 3600
-                                training = st.session_state.get("training_mode", False)
-
-                                # Certification gate (production mode only)
-                                can_sched, cert_issues = check_employee_schedulable(
-                                    sel_id, sel_emp["role"], certs
-                                )
-                                if not training and not can_sched:
-                                    st.error(
-                                        f"**Cannot schedule {sel_emp['name']} — certification required by California law:**\n\n"
-                                        + "\n".join(f"- {i}" for i in cert_issues)
-                                        + "\n\nEmployee must provide valid documentation before being scheduled. "
-                                        "Use the Employee view to upload renewed certifications."
-                                    )
-                                # Duration gate — checked before anything else
-                                elif hours > 16:
-                                    st.error(
-                                        f"🚫 **Shift Blocked — {hours:.1f} hours is not permitted.**  \n"
-                                        "Shifts over 16 hours cannot be scheduled. "
-                                        "Please correct the start or end time."
-                                    )
-                                else:
-                                    viol, reason = check_turnaround(sel_id, start_dt, end_dt, shifts)
-                                    if viol:
-                                        st.error(f"🚫 **Blocked — 8h Turnaround Violation**\n\n{reason}")
-                                    else:
-                                        new_shift = pd.DataFrame([{
-                                            "id": next_id(shifts), "employee_id": sel_id,
-                                            "date": sel_day.isoformat(),
-                                            "start_datetime": start_dt, "end_datetime": end_dt,
-                                            "notes": v_notes.strip(),
-                                            "venue_id": venue_opts[v_venue_label],
-                                        }])
-                                        shifts = pd.concat([shifts, new_shift], ignore_index=True)
-                                        save_shifts(shifts)
-                                        new_streak, _ = get_consecutive_streak(sel_id, shifts)
-                                        lvl, b_icon = burnout_level(new_streak)
-                                        st.session_state.vis_schedule_day = None
-                                        if hours > 8:
-                                            st.warning(
-                                                f"⚠️ Shift saved — **{hours:.1f} hours** is a long shift. "
-                                                "It appears yellow on the calendar as a reminder."
-                                            )
-                                        if lvl != "ok":
-                                            st.warning(
-                                                f"Shift added, but {b_icon} **{sel_emp['name']}** now has "
-                                                f"**{new_streak} consecutive days** — review Burnout Monitor."
-                                            )
-                                        st.rerun()
+            _msid = st.session_state.get("vis_move_shift_id")
+            if _msid and not st.session_state.get("vis_move_confirm"):
+                _mr = shifts[shifts["id"] == _msid]
+                if len(_mr):
+                    _ms  = _mr.iloc[0]
+                    _mse = employees[employees["id"] == _ms["employee_id"]]
+                    _mn  = _mse.iloc[0]["name"] if len(_mse) else "?"
+                    _od  = pd.Timestamp(_ms["start_datetime"]).date()
+                    st.info(f"Moving **{_mn}'s** shift ({_od.strftime('%A, %B %d')}) — pick a new day:")
+                    _p1, _p2, _p3 = st.columns([3, 2, 2])
+                    _week_start2 = week_start
+                    _mvlbls = [(week_start + timedelta(days=i)).strftime("%a %-m/%-d") for i in range(7)]
+                    _mvsel  = _p1.selectbox("New day", _mvlbls, key="vis_mv_day_sel")
+                    _mvoff  = _mvlbls.index(_mvsel)
+                    _mvnd   = week_start + timedelta(days=_mvoff)
+                    if _p2.button("Move here →", type="primary", key="vis_mv_submit"):
+                        st.session_state.vis_move_confirm  = {"shift_id": _msid, "new_day": _mvnd}
+                        st.session_state.vis_move_shift_id = None
+                        st.rerun()
+                    if _p3.button("Cancel", key="vis_mv_cancel"):
+                        st.session_state.vis_move_shift_id = None
+                        st.rerun()
+                else:
+                    st.session_state.vis_move_shift_id = None
 
 
     # ── Weekly View (read-only grid) ───────────────────────────────────────
@@ -1092,12 +1311,18 @@ if is_manager:
                     tn = tgt_name[0]  if len(tgt_name)  else "Unknown"
                     rs = fmt_shift(req_shift.iloc[0]) if len(req_shift) else "Deleted shift"
                     ts = fmt_shift(tgt_shift.iloc[0]) if len(tgt_shift) else "Deleted shift"
-                    si = {"pending": "🟡", "approved": "🟢", "denied": "🔴"}.get(swap["status"], "")
+                    badge_map = {
+                        "pending":  '<span style="background:#FEF3C7;color:#92400E;border:1px solid #F5A623;border-radius:4px;padding:2px 8px;font-size:0.78em;font-weight:700">⇄ Pending</span>',
+                        "approved": '<span style="background:#D1FAE5;color:#065F46;border:1px solid #34D399;border-radius:4px;padding:2px 8px;font-size:0.78em;font-weight:700">⇄ Approved</span>',
+                        "denied":   '<span style="background:#FEE2E2;color:#7F1D1D;border:1px solid #F87171;border-radius:4px;padding:2px 8px;font-size:0.78em;font-weight:700">⇄ Denied</span>',
+                    }
+                    si = badge_map.get(swap["status"], "")
 
                     with st.container(border=True):
                         st.markdown(
                             f"{si} **{rn}** wants to swap with **{tn}**  "
-                            f"— {pd.to_datetime(swap['requested_at']).strftime('%b %d %I:%M %p')}"
+                            f"— {pd.to_datetime(swap['requested_at']).strftime('%b %d %I:%M %p')}",
+                            unsafe_allow_html=True
                         )
                         c1, c2 = st.columns(2)
                         c1.markdown(f"**{rn}'s shift:** {rs}")
@@ -1141,7 +1366,7 @@ if is_manager:
 
     # ── Certifications ─────────────────────────────────────────────────────
     with tab_certs:
-        st.markdown("""<div style="display:flex;align-items:center;gap:16px;margin-bottom:8px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="56" height="56"><defs><radialGradient id="goldSeal" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#FFE566"/><stop offset="50%" stop-color="#D4A017"/><stop offset="100%" stop-color="#B8860B"/></radialGradient></defs><polygon fill="url(#goldSeal)" points="12,0.5 14.94,2.97 18.76,2.70 19.69,6.41 22.94,8.45 21.5,12 22.94,15.55 19.69,17.59 18.76,21.30 14.94,21.03 12,23.5 9.06,21.03 5.24,21.30 4.31,17.59 1.06,15.55 2.5,12 1.06,8.45 4.31,6.41 5.24,2.70 9.06,2.97"/><polyline points="8.5,12 10.8,14.8 15.5,9" fill="none" stroke="#0F2D52" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:1.45em;font-weight:800;color:#0F2D52;letter-spacing:-0.3px">Certification Tracker</span></div>""", unsafe_allow_html=True)
+        st.subheader("Certification Tracker")
         if len(employees) == 0:
             st.info("Add employees to track certifications.")
         else:
@@ -1373,16 +1598,89 @@ else:
     st.divider()
 
     tab_my_shifts, tab_swap_req, tab_my_certs = st.tabs([
-        "📅 My Shifts", "🔄 Request Swap", "🏅 My Certifications"
+        "📅 My Shifts", "Request Swap", "My Certifications"
     ])
 
     with tab_my_shifts:
-        st.subheader("My Upcoming Shifts")
-        my_shifts = shifts[(shifts["employee_id"] == emp_id) & (shifts["start_datetime"] >= datetime.now())].sort_values("start_datetime")
-        if len(my_shifts) == 0:
+        st.subheader("My Schedule")
+        all_my_shifts = shifts[shifts["employee_id"] == emp_id].copy()
+
+        # ── Visual planner: 4-week rolling calendar ────────────────────────
+        today_d = date.today()
+        cal_start = today_d - timedelta(days=today_d.weekday())  # Monday of current week
+        cal_end   = cal_start + timedelta(weeks=4) - timedelta(days=1)
+
+        # Build shift lookup by date
+        shift_by_date = {}
+        for _, s in all_my_shifts.iterrows():
+            sd = pd.Timestamp(s["start_datetime"]).date()
+            if cal_start <= sd <= cal_end:
+                shift_by_date.setdefault(sd, []).append(s)
+
+        role_color = ROLE_COLORS.get(emp_role, "#0F2D52")
+
+        # Render 4-week grid
+        day_headers = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        header_html = "".join(
+            f'<div style="text-align:center;font-weight:700;font-size:0.78em;'
+            f'color:#718096;padding:4px 0">{d}</div>' for d in day_headers
+        )
+
+        cells_html = ""
+        for week in range(4):
+            for dow in range(7):
+                d = cal_start + timedelta(weeks=week, days=dow)
+                is_today = (d == today_d)
+                is_past  = (d < today_d)
+                day_shifts = shift_by_date.get(d, [])
+
+                border = "2px solid #F5A623" if is_today else "1px solid #e2e8f0"
+                bg     = "#fffbeb" if is_today else ("#f8fafc" if is_past else "#ffffff")
+                num_style = (
+                    f"background:#F5A623;color:#fff;border-radius:50%;width:22px;height:22px;"
+                    f"display:inline-flex;align-items:center;justify-content:center;"
+                    f"font-size:0.78em;font-weight:700"
+                    if is_today else
+                    f"font-size:0.78em;font-weight:{'700' if day_shifts else '400'};"
+                    f"color:{'#0F2D52' if not is_past else '#adb5bd'}"
+                )
+                shift_blocks = ""
+                for s in day_shifts:
+                    t_start = pd.Timestamp(s["start_datetime"]).strftime("%-I:%M%p").lower()
+                    t_end   = pd.Timestamp(s["end_datetime"]).strftime("%-I:%M%p").lower()
+                    vn = ""
+                    if pd.notna(s.get("venue_id")) and len(venues) > 0:
+                        vrow = venues[venues["id"] == int(s["venue_id"])]
+                        if len(vrow):
+                            vn = f'<div style="font-size:0.72em;opacity:0.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{vrow.iloc[0]["name"]}</div>'
+                    shift_blocks += (
+                        f'<div style="background:{role_color};color:#fff;border-radius:4px;'
+                        f'padding:2px 5px;margin-top:3px;font-size:0.72em;font-weight:600;line-height:1.3">'
+                        f'{t_start}–{t_end}{vn}</div>'
+                    )
+
+                cells_html += (
+                    f'<div style="border:{border};background:{bg};border-radius:7px;'
+                    f'padding:5px 6px;min-height:72px;position:relative">'
+                    f'<span style="{num_style}">{d.day}</span>'
+                    f'{shift_blocks}'
+                    f'</div>'
+                )
+
+        planner_html = (
+            f'<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:16px">'
+            f'{header_html}{cells_html}</div>'
+        )
+        st.markdown(planner_html, unsafe_allow_html=True)
+
+        # ── Upcoming shift list ────────────────────────────────────────────
+        st.divider()
+        st.markdown("**Upcoming Shifts**")
+        my_upcoming = all_my_shifts[all_my_shifts["start_datetime"] >= datetime.now()].sort_values("start_datetime")
+        if len(my_upcoming) == 0:
             st.info("No upcoming shifts scheduled.")
         else:
-            for _, s in my_shifts.iterrows():
+            for _, s in my_upcoming.iterrows():
                 dur = (s["end_datetime"] - s["start_datetime"]).total_seconds() / 3600
                 with st.container(border=True):
                     c1, c2, c3 = st.columns([2, 2, 1])
@@ -1445,10 +1743,14 @@ else:
             st.info("No swap requests submitted.")
         else:
             for _, swap in my_swaps.iterrows():
-                icon   = {"pending": "🟡 Pending", "approved": "🟢 Approved", "denied": "🔴 Denied"}.get(swap["status"], swap["status"])
+                _ibadge = {
+                    "pending":  '<span style="background:#FEF3C7;color:#92400E;border:1px solid #F5A623;border-radius:4px;padding:2px 8px;font-size:0.78em;font-weight:700">⇄ Pending</span>',
+                    "approved": '<span style="background:#D1FAE5;color:#065F46;border:1px solid #34D399;border-radius:4px;padding:2px 8px;font-size:0.78em;font-weight:700">⇄ Approved</span>',
+                    "denied":   '<span style="background:#FEE2E2;color:#7F1D1D;border:1px solid #F87171;border-radius:4px;padding:2px 8px;font-size:0.78em;font-weight:700">⇄ Denied</span>',
+                }.get(swap["status"], swap["status"])
                 tgt    = employees[employees["id"] == swap["target_id"]]
                 tname  = tgt.iloc[0]["name"] if len(tgt) else "Unknown"
-                st.markdown(f"**{icon}** — swap with **{tname}**  ·  {pd.to_datetime(swap['requested_at']).strftime('%b %d')}")
+                st.markdown(f"{_ibadge} — swap with **{tname}**  ·  {pd.to_datetime(swap['requested_at']).strftime('%b %d')}", unsafe_allow_html=True)
                 if pd.notna(swap.get("manager_notes")) and swap.get("manager_notes"):
                     st.caption(f"Manager note: {swap['manager_notes']}")
 
@@ -1466,7 +1768,7 @@ else:
                 else:
                     latest = my_certs.iloc[0]
                     label, _ = cert_badge(latest["expiry_date"])
-                    st.markdown(f"**Status:** {label}")
+                    st.markdown(f"**Status:** {label}", unsafe_allow_html=True)
                     st.markdown(f"**Expiry:** {latest['expiry_date'].strftime('%B %d, %Y')}")
                     if latest.get("file_name") and pd.notna(latest["file_name"]):
                         fp = os.path.join(CERT_DIR, str(latest["file_name"]))

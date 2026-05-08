@@ -1,2 +1,2 @@
 id,requester_id,requester_shift_id,target_id,target_shift_id,status,requester_note,requested_at,resolved_at,manager_notes
-1,11,46,6,17,approved,I have a family commitment Thursday evening — can we swap?,2026-05-06 18:30:00,2026-05-07T20:25:42.726306,
+1,11,46,6,17,pending,I have a family commitment Thursday evening — can we swap?,2026-05-06 18:30:00,,

@@ -1,49 +1,25 @@
-# 🎉 HRT AI Hackathon Template
+# SmartSchedules
 
-A GitHub Codespace template for the Hospitality, Recreation, and Tourism (HRT) Applied Research Hackathon. Build a working Streamlit prototype with Claude — no coding experience required.
+ ## A Scheduling App like No Other 
+ 
+ Designed for the fast-pace environment of the hospitality industry, SmartSchedules simplifies the daunting task of scheduling for both F&B managers and staff. While similar platforms exist, SmartSchedules proves to push the limitations and cabilities of other apps through integration of compliance trackers for hospitality operations. Together these functions support daily operations with ease and efficiency. 
 
-## Getting Started
+## Features
 
-1. Click **Code** → **Create Codespace on main**
-2. Wait for the environment to set up (1~5 min). The terminal will tell you when everything is ready.
-3. Click the **Claude** (orange star) icon at the top right corner
-4. Sign in with your **Claude Team** account
-5. Tell Claude what you want to build! For example:
-   > "Build a dashboard that shows hotel occupancy by city."
+- Employee enrollment 
+- Venue assignments
+- Visual scheduling
+- Weekly view
+- Swap request and approval
+- Certification compliance tracker
+- Burnout monitor
+- Training mode
 
-## Claude Commands
+## How to Use
 
-Type these in the Claude Code chat at any time:
+### Managers
 
-| Command | What it does |
-|---------|-------------|
-| `/run` | Start your app and give you a clickable link to view it |
-| `/checkpoint` | Save your current progress |
-| `/back-to-checkpoint` | Restore to your last saved checkpoint |
-| `/restart` | Reset everything back to the very beginning |
-| `/write-readme` | Generate a README based on your current app |
-| `/push` | Publish your project to your own GitHub for your portfolio |
-| `/handoff` | Write a session summary to pick up later |
-| `/resume` | Load the previous session summary |
+Managers are able to login and click on designated tab suitable for their desired task. Employee and Venue tabs allow the manager to register the specific information of their property. Once the data is entered there are two scheduling views that allow a visual representation to assist through the planning phase or list format suitable for printing. Additionally, this feature enforces eight hour breaks in between scheduled shifts. Notifications for swap requests alert managers to approve or deny them after being initiated/accepted by staff. The built in certification tracker displays which employees are work ready and prohibits schedule placement when incompliant. The burnout monitor tracks employee consecutive shifts.
 
-## What's Inside
-
-| File / Folder | Purpose |
-|---------------|---------|
-| `app.py` | Your Streamlit app — Claude writes all code here |
-| `CLAUDE.md` | Instructions that guide Claude's behavior |
-| `requirements.txt` | Python dependencies (Streamlit, Pandas) |
-| `data/` | Place your own datasets here (CSV, etc.) |
-| `data_ai/` | Claude saves any generated or crawled data here |
-
-## Uploading Your Own Data
-
-1. In the left sidebar, right-click the `data/` folder
-2. Select **Upload...**
-3. Choose your file
-
-CSV files will automatically open as a table when you click them.
-
----
-
-**Have fun building!** 🚀
+### Employees
+Once logged in, staff members are able to view their schedules in real-time. The shift swap feature allows a team member to request a shift trade without having the other employee's contact information and notify management for approval. The certifications tab allows the employee to upload a pdf file of their certifications as well as alerting staff when they are approaching expiration.
